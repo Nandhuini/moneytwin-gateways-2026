@@ -12,228 +12,15 @@ from moneytwin.consent import usage_entry
 from moneytwin.pipeline import build_twin
 from moneytwin.twin_store import TwinStore
 from moneytwin.views import behaviour_view, leaks_view, overview, privacy, whatif
+from moneytwin.views.common import inject_theme, page_header
 
 
 # ============================================================
-# MONEYTWIN UI THEME
+# MONEYTWIN UI THEME (all styles live in moneytwin/views/common.py)
 # ============================================================
 
 def apply_theme():
-    st.markdown(
-        """
-        <style>
-
-        /* ================================
-           MAIN APP
-        ================================= */
-
-        .stApp {
-            background: #f7f8fa;
-        }
-
-        .block-container {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-            max-width: 1400px;
-        }
-
-
-        /* ================================
-           SIDEBAR
-        ================================= */
-
-        section[data-testid="stSidebar"] {
-            background: #111827;
-            border-right: 1px solid #1f2937;
-        }
-
-        section[data-testid="stSidebar"] * {
-            color: #f9fafb;
-        }
-
-        section[data-testid="stSidebar"] h1,
-        section[data-testid="stSidebar"] h2,
-        section[data-testid="stSidebar"] h3 {
-            color: #ffffff;
-        }
-
-        section[data-testid="stSidebar"] .stCaption {
-            color: #9ca3af;
-        }
-
-        /* Sidebar radio buttons */
-
-        section[data-testid="stSidebar"]
-        div[role="radiogroup"] label {
-            border-radius: 10px;
-            padding: 8px 10px;
-            margin: 3px 0;
-            transition: all 0.2s ease;
-        }
-
-        section[data-testid="stSidebar"]
-        div[role="radiogroup"] label:hover {
-            background: #1f2937;
-        }
-
-
-        /* ================================
-           HEADINGS
-        ================================= */
-
-        h1 {
-            color: #111827;
-            font-weight: 750;
-            letter-spacing: -0.5px;
-        }
-
-        h2 {
-            color: #111827;
-            font-weight: 700;
-        }
-
-        h3 {
-            color: #1f2937;
-            font-weight: 650;
-        }
-
-
-        /* ================================
-           METRIC CARDS
-        ================================= */
-
-        div[data-testid="stMetric"] {
-            background: #ffffff;
-            padding: 18px;
-            border-radius: 14px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
-        }
-
-        div[data-testid="stMetricLabel"] {
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
-
-        div[data-testid="stMetricValue"] {
-            color: #111827;
-            font-weight: 750;
-        }
-
-
-        /* ================================
-           BUTTONS
-        ================================= */
-
-        .stButton > button {
-            border-radius: 10px;
-            font-weight: 600;
-            border: 1px solid #d1d5db;
-            padding: 8px 18px;
-            transition: all 0.2s ease;
-        }
-
-        .stButton > button:hover {
-            border-color: #111827;
-            transform: translateY(-1px);
-        }
-
-
-        /* ================================
-           FILE UPLOADER
-        ================================= */
-
-        [data-testid="stFileUploader"] {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 8px;
-            border: 1px solid #e5e7eb;
-        }
-
-
-        /* ================================
-           INPUTS
-        ================================= */
-
-        div[data-baseweb="input"] {
-            border-radius: 9px;
-        }
-
-        div[data-baseweb="select"] {
-            border-radius: 9px;
-        }
-
-
-        /* ================================
-           EXPANDERS
-        ================================= */
-
-        [data-testid="stExpander"] {
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            background: #ffffff;
-        }
-
-
-        /* ================================
-           DATA TABLES
-        ================================= */
-
-        [data-testid="stDataFrame"] {
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #e5e7eb;
-        }
-
-
-        /* ================================
-           ALERTS
-        ================================= */
-
-        div[data-testid="stAlert"] {
-            border-radius: 12px;
-        }
-
-
-        /* ================================
-           DIVIDERS
-        ================================= */
-
-        hr {
-            border-color: #e5e7eb;
-        }
-
-
-        /* ================================
-           SLIDERS
-        ================================= */
-
-        div[data-testid="stSlider"] {
-            padding: 5px 0;
-        }
-
-
-        /* ================================
-           CHECKBOXES
-        ================================= */
-
-        div[data-testid="stCheckbox"] {
-            padding: 2px 0;
-        }
-
-
-        /* ================================
-           REMOVE EXTRA TOP SPACE
-        ================================= */
-
-        header[data-testid="stHeader"] {
-            background: transparent;
-        }
-
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    inject_theme()
 
 
 # ============================================================
@@ -246,6 +33,14 @@ PAGES = {
     "Behaviour and prediction": behaviour_view,
     "What-if simulator": whatif,
     "Privacy and data": privacy,
+}
+
+PAGE_ICONS = {
+    "Overview": "🏠",
+    "Money leaks": "💸",
+    "Behaviour and prediction": "📈",
+    "What-if simulator": "🔮",
+    "Privacy and data": "🔒",
 }
 
 
@@ -280,6 +75,10 @@ def read_upload(file) -> pd.DataFrame | None:
 # SIDEBAR
 # ============================================================
 
+def sidebar_heading(text: str) -> None:
+    st.sidebar.markdown(f'<div class="mt-side-h">{text}</div>', unsafe_allow_html=True)
+
+
 def sidebar_inputs(store: TwinStore):
     """Choose data and set goals. Returns raw tables and the profile,
     or stops the app with a clear message.
@@ -298,41 +97,15 @@ def sidebar_inputs(store: TwinStore):
             ):
                 st.session_state.pop(k, None)
 
-    # Sidebar title
+    # Sidebar brand
     st.sidebar.markdown(
-        """
-        <div style="
-            padding: 8px 0 18px 0;
-            border-bottom: 1px solid #374151;
-            margin-bottom: 18px;
-        ">
-            <div style="
-                font-size: 26px;
-                font-weight: 800;
-                color: white;
-                letter-spacing: -0.5px;
-            ">
-                💰 MoneyTwin
-            </div>
-
-            <div style="
-                font-size: 12px;
-                color: #9ca3af;
-                margin-top: 4px;
-            ">
-                Your personal spending twin
-            </div>
-        </div>
-        """,
+        '<div class="mt-brand"><div class="mt-brand-name">💰 MoneyTwin</div>'
+        '<div class="mt-brand-tag">Your personal spending twin</div></div>',
         unsafe_allow_html=True,
     )
 
     # Data source
-    st.sidebar.markdown(
-        '<div style="color:#d1d5db;font-size:13px;font-weight:600;'
-        'margin-bottom:5px;">DATA SOURCE</div>',
-        unsafe_allow_html=True,
-    )
+    sidebar_heading("Data source")
 
     source = st.sidebar.radio(
         "Data source",
@@ -382,7 +155,7 @@ def sidebar_inputs(store: TwinStore):
         }
 
         if tx is None:
-            st.title("MoneyTwin")
+            page_header("Get started", "MoneyTwin", "Upload your transactions to build your spending twin.")
 
             st.info(
                 "Upload a transactions CSV with at least: "
@@ -397,20 +170,7 @@ def sidebar_inputs(store: TwinStore):
     defaults = dict(profile)
     saved = {**defaults, **store.profile}
 
-    st.sidebar.markdown(
-        """
-        <div style="
-            margin-top: 22px;
-            margin-bottom: 8px;
-            color: #d1d5db;
-            font-size: 13px;
-            font-weight: 600;
-        ">
-            YOUR PLAN
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    sidebar_heading("Your plan")
 
     profile = {
         "monthly_allowance": st.sidebar.number_input(
@@ -520,26 +280,21 @@ def main() -> None:
         st.session_state["usage_sig"] = signature
 
     # Navigation
-    st.sidebar.markdown(
-        """
-        <div style="
-            margin-top: 28px;
-            margin-bottom: 8px;
-            color: #d1d5db;
-            font-size: 13px;
-            font-weight: 600;
-        ">
-            DASHBOARD
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    sidebar_heading("Dashboard")
 
     page = st.sidebar.radio(
         "Go to",
         list(PAGES),
         key="page",
         label_visibility="collapsed",
+        format_func=lambda name: f"{PAGE_ICONS.get(name, '')}  {name}",
+    )
+
+    # Sidebar status: which data the twin is using right now
+    st.sidebar.markdown(
+        f'<div class="mt-side-note">🔒 <b>{len(allowed)} of {len(ALL_CATEGORIES)}</b> data categories in use.'
+        "<br>Change this any time in Privacy and data.</div>",
+        unsafe_allow_html=True,
     )
 
     # Render selected page
