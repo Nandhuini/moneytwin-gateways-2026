@@ -36,6 +36,17 @@ def add_flags(tx: pd.DataFrame, payday_day: int) -> pd.DataFrame:
 
 def analyze(tx: pd.DataFrame, payday_day: int) -> dict:
     """Heatmap of net spend by time of month and time of day, plus personal triggers."""
+    if tx.empty:
+        empty = pd.DataFrame(0.0, index=BANDS, columns=[b[2] for b in BUCKETS])
+        return {
+            "heatmap": empty,
+            "triggers": [],
+            "peak_band": BANDS[0],
+            "peak_bucket": BUCKETS[0][2],
+            "late_night_share": 0.0,
+        }
+
+    disc = tx[~tx["is_recurring"]].copy()
     disc = tx[~tx["is_recurring"]]
     heat = disc.pivot_table(index="band", columns="bucket", values="net_total", aggfunc="sum", fill_value=0.0)
     heat = heat.reindex(index=BANDS, columns=[b[2] for b in BUCKETS], fill_value=0.0)
