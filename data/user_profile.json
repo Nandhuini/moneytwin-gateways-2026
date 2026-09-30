@@ -1,0 +1,8 @@
+{
+  "name": "Demo Student",
+  "monthly_allowance": 19000,
+  "payday_day": 1,
+  "monthly_savings_goal": 3000,
+  "goal_label": "Laptop fund",
+  "note": "Synthetic demo data only."
+}
