@@ -22,13 +22,18 @@ streamlit run app.py
 | `MONEYTWIN_DATA_DIR` | Where demo data and `twin_profile.json` live (default `./data`). |
 
 Copy `.env.example` to `.env` for local use. Never commit `.env`. Only summary numbers are sent to the LLM, never raw transactions.
+## Live Demo
 
-## Deploy (Streamlit Community Cloud)
+🌐 https://moneytwin-gateways-2026.onrender.com/
 
-1. Push this folder to a **public** GitHub repo.
-2. On share.streamlit.io choose the repo, branch `main`, main file `app.py`.
-3. Optional: under Advanced settings > Secrets add `ANTHROPIC_API_KEY = "..."`.
-4. Deploy. The demo works immediately with the committed synthetic data.
+## Deploy (Render)
+
+MoneyTwin is deployed on Render.
+
+For local development:
+
+```bash
+streamlit run app.py
 
 ## Upload format
 
